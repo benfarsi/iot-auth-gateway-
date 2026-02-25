@@ -1,0 +1,27 @@
+# PKI secrets — NEVER commit private keys or device certs
+pki/ca/*.key
+pki/ca/*.crt
+pki/devices/
+pki/devices.db
+pki/jwt-signing.key
+
+# Go build artifacts
+bin/
+*.exe
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Logs
+*.log
+/var/log/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

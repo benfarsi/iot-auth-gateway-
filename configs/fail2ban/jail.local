@@ -1,0 +1,32 @@
+# Fail2ban jail for the IoT Auth Gateway.
+# Install to: /etc/fail2ban/jail.d/iot-gateway.local
+
+[iot-gateway]
+enabled   = true
+filter    = iot-gateway
+logpath   = /var/log/iot-gateway/audit.log
+backend   = auto
+
+# Ban after 5 failures within a 60-second window.
+maxretry  = 5
+findtime  = 60
+
+# Ban duration: 30 minutes.
+bantime   = 1800
+
+# Action: block with iptables (multiport) and optionally send email.
+action    = iptables-multiport[name=iot-gateway, port="8443", protocol=tcp]
+
+# Whitelist trusted management IPs (comma-separated).
+# ignoreip = 127.0.0.1/8 ::1 10.0.0.0/8
+
+
+[sshd]
+enabled   = true
+port      = ssh
+filter    = sshd
+logpath   = /var/log/auth.log
+maxretry  = 3
+findtime  = 30
+bantime   = 3600
+action    = iptables[name=SSH, port=ssh, protocol=tcp]

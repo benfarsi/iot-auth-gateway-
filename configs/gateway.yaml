@@ -1,0 +1,25 @@
+gateway:
+  listen_addr: ":8443"
+  backend_addr: "http://localhost:8080"
+  read_timeout: 30s
+  write_timeout: 30s
+
+tls:
+  ca_cert_file: "pki/ca/ca.crt"
+  server_cert_file: "pki/ca/server.crt"
+  server_key_file: "pki/ca/server.key"
+  client_auth: "require"
+
+jwt:
+  signing_key_file: "pki/jwt-signing.key"
+  issuer: "iot-auth-gateway"
+  token_ttl: 1h
+
+logging:
+  level: "info"
+  output: "/var/log/iot-gateway/audit.log"
+  format: "json"
+
+rate_limit:
+  max_failures_per_min: 10
+  ban_duration: 15m

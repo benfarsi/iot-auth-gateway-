@@ -1,0 +1,28 @@
+[Unit]
+Description=IoT Device Provisioner (one-shot)
+Documentation=https://github.com/benfarsi/iot-auth-gateway
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=iot-gateway
+Group=iot-gateway
+WorkingDirectory=/opt/iot-gateway
+
+# Usage: systemctl start iot-provisioner@<device-id>
+# Parameterised via instance name. Override DEVICE_ID env to change target.
+Environment=DEVICE_ID=%i
+ExecStart=/usr/bin/python3 /opt/iot-gateway/provisioning/provision.py \
+    --device-id ${DEVICE_ID} \
+    --pki-dir /opt/iot-gateway/pki/ca \
+    --device-dir /opt/iot-gateway/pki/devices \
+    --db /opt/iot-gateway/pki/devices.db
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/iot-gateway/pki
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

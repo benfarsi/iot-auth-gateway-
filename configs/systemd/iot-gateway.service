@@ -1,0 +1,61 @@
+[Unit]
+Description=IoT Authentication Gateway
+Documentation=https://github.com/benfarsi/iot-auth-gateway
+After=network-online.target
+Wants=network-online.target
+# Ensure the gateway restarts after a crash but not on clean stop.
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=iot-gateway
+Group=iot-gateway
+
+WorkingDirectory=/opt/iot-gateway
+ExecStart=/opt/iot-gateway/bin/gateway -config /opt/iot-gateway/configs/gateway.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+
+# --- Hardening ---
+# Prevent privilege escalation.
+NoNewPrivileges=yes
+# Mount the entire filesystem read-only except for designated paths.
+ProtectSystem=strict
+ProtectHome=yes
+# Allow writing only to the audit log directory and PKI dir.
+ReadWritePaths=/var/log/iot-gateway /opt/iot-gateway/pki
+# Private /tmp — not shared with other services.
+PrivateTmp=yes
+# Prevent access to kernel tunables.
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+# Isolate control groups.
+ProtectControlGroups=yes
+# Restrict system calls to a minimal allow-list.
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+# Remove all ambient capabilities (gateway binds to port >1024, no cap needed).
+AmbientCapabilities=
+CapabilityBoundingSet=
+# Restrict address families to inet/inet6 and unix only.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+# No realtime scheduling.
+RestrictRealtime=yes
+# Prevent write+exec memory mappings.
+MemoryDenyWriteExecute=yes
+# Lock down namespaces.
+RestrictNamespaces=yes
+# Private device access.
+PrivateDevices=yes
+
+# --- Logging ---
+# Journal logs tagged with the service name for easy filtering.
+SyslogIdentifier=iot-gateway
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
